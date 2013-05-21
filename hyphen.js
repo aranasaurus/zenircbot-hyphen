@@ -9,12 +9,26 @@ sub.on('message', function( channel, message ) {
     if (msg.version == 1) {
         if (msg.type == 'privmsg') {
             var match;
-            if (match=/^.* a (\w+)[\- ](ass) ([^!.$]+)(.*)$/.exec(msg.data.message)) {
+            var regex = /^.*(that|those)(?:'?(s|re))? (is|are)? ?(a|an|some) (\w+)[\- ](ass) ([^!.$]+)(.*)$/i;
+            if (match=regex.exec(msg.data.message)) {
+                var demonstrative = match[1],
+                    verb = match[2] || match[3],
+                    article = match[4],
+                    adjective = match[5],
+                    ass = match[6],
+                    noun = match[7],
+                    punctuation = match[8];
+                if (verb == "s") {
+                    verb = "is";
+                } else if (verb == "re") {
+                    verb = "are";
+                }
                 var responses = [
-                    "wow, that *is* a " + match[1] + " ass-" + match[3] + match[4],
-                    "dude, you're right, that ass-" + match[3] + " is totally " + match[1] + match[4],
-                    "That is a " + match[1] + " ass-" + match[3] + match[4],
-                    "I honestly can't believe just how " + match[1] + " that ass-" + match[3] + " is" + match[4]
+                    "wow, " + demonstrative + " *" + verb + "* " + article + " " + adjective + " " + ass + "-" + noun + punctuation,
+                    "dude, you're right, " + demonstrative + " " + ass + "-" + noun + " " + verb + " totally " + adjective + punctuation,
+                    "yeah " + demonstrative + " " + verb + " " + article + " " + adjective + " " + ass + "-" + noun + punctuation,
+                    demonstrative + " " + verb + " " + article + " " + adjective + " " + ass + "-" + noun + punctuation,
+                    "I honestly can't believe just how " + adjective + " " + demonstrative + " " + ass + "-" + noun + " " + verb + punctuation
                 ];
                 zen.send_privmsg(msg.data.channel, responses[Math.floor(Math.random() * responses.length)]);
             }
